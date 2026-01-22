@@ -51,8 +51,8 @@ class Sentiment140Loader:
         if filepath:
             self.filepath = Path(filepath)
         else:
-            # Look for common file names in datasets folder
-            for name in ['sentiment140.csv', 'training.1600000.processed.noemoticon.csv']:
+            # Look for common file names in datasets folder (prefer smaller file)
+            for name in ['sentiment140_small.csv', 'sentiment140.csv', 'training.1600000.processed.noemoticon.csv']:
                 path = DATASETS_DIR / name
                 if path.exists():
                     self.filepath = path
