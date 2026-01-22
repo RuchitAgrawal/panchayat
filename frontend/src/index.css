@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+/* Custom CSS Variables for Panchayat Dashboard */
+:root {
+  --color-primary: #6366f1;
+  --color-secondary: #8b5cf6;
+  --color-positive: #22c55e;
+  --color-negative: #ef4444;
+  --color-neutral: #f59e0b;
+  --color-bg-dark: #0f172a;
+  --color-bg-card: #1e293b;
+  --color-text: #f8fafc;
+  --color-text-muted: #94a3b8;
+}
+
+/* Global Styles */
+body {
+  @apply bg-slate-900 text-slate-100 font-sans antialiased;
+  min-height: 100vh;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  @apply bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-xl;
+}
+
+/* Gradient Text */
+.gradient-text {
+  @apply bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent;
+}
+
+/* Glow Effects */
+.glow-positive {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+.glow-negative {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.glow-neutral {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+}
+
+/* Chart Container */
+.chart-container {
+  @apply bg-slate-800/30 rounded-xl p-4 border border-slate-700/30;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-500;
+}

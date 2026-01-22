@@ -1,0 +1,35 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Database
+*.db
+*.sqlite3
+
+# ML Models cache
+.cache/
+models_cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node modules (frontend)
+node_modules/
+dist/
+
+# Logs
+*.log

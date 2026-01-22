@@ -1,0 +1,27 @@
+# Core
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-dotenv==1.0.0
+pydantic==2.5.3
+
+# ML/DL - Sentiment Analysis
+transformers==4.37.0
+torch==2.1.2
+scikit-learn==1.4.0
+
+# NLP - Topic Modeling
+bertopic==0.16.0
+sentence-transformers==2.3.1
+
+# Reddit API
+praw==7.7.1
+
+# Database
+sqlalchemy==2.0.25
+
+# Data Processing
+pandas==2.1.4
+numpy==1.26.3
+
+# HTTP Client (for frontend API)
+httpx==0.26.0
