@@ -1,127 +1,110 @@
-# 🏛️ Panchayat - Sentiment Analysis Dashboard
+# Panchayat - Sentiment Analysis Dashboard
 
-A full-stack sentiment analysis platform that combines advanced ML models with a modern React dashboard for real-time insights.
+A full-stack sentiment analysis platform that combines advanced ML models with a modern React dashboard for real-time insights from Reddit, Twitter, and custom datasets.
 
 ![Dashboard Preview](docs/dashboard-dark.png)
 
 ## ✨ Features
 
-- **🤖 ML Ensemble** - BERT, LSTM (TextBlob), and Random Forest with weighted voting
+- **🤖 ML Ensemble** - Hybrid model using BERT, LSTM (TextBlob), and Random Forest
 - **📊 Real-time Dashboard** - Clean React UI with light/dark theme toggle
-- **📈 Trend Analysis** - Time-series sentiment tracking with Recharts
+- **📈 Trend Analysis** - Time-series sentiment tracking
 - **🔄 Multiple Data Sources** - Reddit API, CSV import, sample data
 - **💾 SQLite Storage** - Persistent post storage with sentiment scores
-- **📱 Responsive Design** - Works on desktop and mobile
 
-## 🚀 Quick Start
+## 🚀 Quick Start Guide
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- Git
+### 1. Clone the Repository
 
-### Backend Setup
+```bash
+git clone https://github.com/RuchitAgrawal/panchayat.git
+cd panchayat
+```
+
+### 2. Backend Setup (Python)
 
 ```bash
 cd backend
-python -m venv venv
-./venv/Scripts/activate  # Windows
-# source venv/bin/activate  # Linux/Mac
 
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# Windows:
+./venv/Scripts/activate
+# Mac/Linux:
+# source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Run the server
 uvicorn main:app --reload --port 8000
 ```
+*Backend runs at: http://localhost:8000*
 
-### Frontend Setup
+### 3. Frontend Setup (React)
 
+Open a new terminal:
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
+
+# Run development server
 npm run dev
 ```
+*Frontend runs at: http://localhost:5173*
 
-### Open the App
-- **Dashboard:** http://localhost:5173
-- **API Docs:** http://localhost:8000/docs
+---
 
-## 📂 Project Structure
+## 📂 Using Kaggle Datasets
 
-```
-panchayat/
-├── backend/
-│   ├── main.py              # FastAPI app with all endpoints
-│   ├── config.py            # Configuration settings
-│   ├── models/              # ML models (BERT, LSTM, RF, Ensemble)
-│   ├── nlp/                 # Topic modeling, trends, N-grams
-│   ├── data/                # Reddit client, database, sample data
-│   └── datasets/            # Place Kaggle CSVs here
-│
-└── frontend/
-    ├── src/
-    │   ├── App.jsx          # Main dashboard
-    │   ├── components/      # React components
-    │   ├── hooks/           # Theme context
-    │   └── api/             # Backend API client
-    └── index.css            # Theme system
-```
+You can analyze large datasets like Sentiment140 (Twitter) or IMDB reviews.
+
+1. **Download Dataset:**
+   - [Sentiment140 (Twitter)](https://www.kaggle.com/datasets/kazanova/sentiment140)
+   - [IMDB Movie Reviews](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews)
+
+2. **Setup:**
+   - Place the downloaded CSV file in `backend/datasets/`
+   - Rename it to `sentiment140.csv` (or `imdb.csv`)
+
+3. **Load Data via API:**
+   ```bash
+   # Example: Load 200 tweets
+   curl -X POST http://localhost:8000/api/kaggle/sentiment140 \
+     -H "Content-Type: application/json" \
+     -d '{"limit": 200, "balanced": true}'
+   ```
+
+---
 
 ## 🔌 API Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/analyze` | POST | Analyze text sentiment |
-| `/api/analyze/batch` | POST | Batch analysis |
-| `/api/trends` | GET | Get sentiment trends |
-| `/api/posts` | GET | Get stored posts |
-| `/api/posts/stats` | GET | Sentiment statistics |
-| `/api/sample/quick` | GET | Load sample data |
-| `/api/kaggle/sentiment140` | POST | Load Kaggle dataset |
-
-## 📊 ML Models
-
-| Model | Weight | Source |
-|-------|--------|--------|
-| BERT | 50% | `nlptown/bert-base-multilingual-uncased-sentiment` |
-| LSTM | 30% | TextBlob (fallback) |
-| Random Forest | 20% | TF-IDF + sklearn |
-
-## 🎨 Dashboard Features
-
-- **Theme Toggle** - Light ↔ Dark mode
-- **Sentiment Gauge** - Overall score visualization
-- **Trend Chart** - Time-series analysis
-- **Stats Cards** - Post counts & percentages
-- **Recent Posts** - Table with sentiment badges
-
-## 📁 Using Kaggle Datasets
-
-1. Download [Sentiment140](https://www.kaggle.com/datasets/kazanova/sentiment140)
-2. Place CSV in `backend/datasets/sentiment140.csv`
-3. Load via API:
-```bash
-curl -X POST http://localhost:8000/api/kaggle/sentiment140 \
-  -H "Content-Type: application/json" \
-  -d '{"limit": 200, "balanced": true}'
-```
+| `/api/trends` | GET | Get real-time trends |
+| `/api/posts` | GET | Fetch stored posts |
+| `/api/sample/quick` | GET | Load built-in sample data |
+| `/api/kaggle/status` | GET | Check available datasets |
 
 ## 🛠️ Tech Stack
 
 **Backend:**
-- FastAPI
+- FastAPI (Python)
 - PyTorch + Transformers (BERT)
 - scikit-learn (Random Forest)
-- SQLAlchemy + SQLite
-- PRAW (Reddit API)
+- SQLite + SQLAlchemy
 
 **Frontend:**
-- React 18 + Vite
-- Recharts
-- CSS Variables (theming)
+- React 18
+- Vite
+- Recharts (Visualization)
+- CSS Variables (Theming)
 
 ## 📝 License
 
-MIT License - feel free to use and modify!
-
----
-
-Built with ❤️ using Python, React, and ML
+MIT License.
