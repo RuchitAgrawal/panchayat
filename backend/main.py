@@ -3,10 +3,17 @@ Panchayat - Sentiment Analysis & Trend Detection API
 
 FastAPI backend for analyzing Reddit posts and detecting trends.
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import List, Optional
+import logging
 
 from config import settings
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -24,6 +31,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Lazy load ensemble model
+_ensemble = None
+
+
+def get_ensemble():
+    """Lazy load the ensemble model."""
+    global _ensemble
+    if _ensemble is None:
+        from models.ensemble import SentimentEnsemble
+        logger.info("Initializing sentiment ensemble...")
+        _ensemble = SentimentEnsemble()
+        logger.info("Ensemble initialized successfully")
+    return _ensemble
+
+
+# Request/Response Models
+class AnalyzeRequest(BaseModel):
+    text: str
+    include_breakdown: bool = True
+
+
+class BatchAnalyzeRequest(BaseModel):
+    texts: List[str]
+    include_breakdown: bool = False
+
 
 @app.get("/")
 async def root():
@@ -40,32 +72,80 @@ async def health_check():
     """Detailed health check."""
     return {
         "status": "healthy",
-        "models_loaded": False,  # Will be True once models are initialized
+        "models_loaded": _ensemble is not None,
         "reddit_configured": bool(settings.reddit_client_id),
         "default_subreddits": settings.default_subreddits
     }
 
 
-# Placeholder endpoints - will be implemented in Phase 2
 @app.post("/api/analyze")
-async def analyze_text(text: str):
+async def analyze_text(request: AnalyzeRequest):
     """
-    Analyze sentiment of a single text.
-    TODO: Implement ensemble model prediction.
+    Analyze sentiment of a single text using ensemble model.
+    
+    Returns:
+        - label: positive/negative/neutral
+        - confidence: 0-1 confidence score
+        - score: -1 to +1 numeric score
+        - breakdown: individual model predictions (optional)
     """
-    return {
-        "text": text[:100] + "..." if len(text) > 100 else text,
-        "sentiment": "neutral",
-        "confidence": 0.0,
-        "message": "Model not loaded yet - Phase 2"
-    }
+    if not request.text or not request.text.strip():
+        raise HTTPException(status_code=400, detail="Text cannot be empty")
+    
+    try:
+        ensemble = get_ensemble()
+        result = ensemble.predict(request.text, include_breakdown=request.include_breakdown)
+        
+        return {
+            "text": request.text[:200] + "..." if len(request.text) > 200 else request.text,
+            **result
+        }
+    except Exception as e:
+        logger.error(f"Analysis error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/analyze/batch")
+async def analyze_batch(request: BatchAnalyzeRequest):
+    """
+    Analyze sentiment of multiple texts.
+    """
+    if not request.texts:
+        raise HTTPException(status_code=400, detail="Texts list cannot be empty")
+    
+    try:
+        ensemble = get_ensemble()
+        results = ensemble.predict_batch(request.texts, include_breakdown=request.include_breakdown)
+        
+        return {
+            "count": len(results),
+            "results": results
+        }
+    except Exception as e:
+        logger.error(f"Batch analysis error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/analyze/quick")
+async def quick_analyze(text: str = Query(..., min_length=1)):
+    """
+    Quick sentiment analysis (GET request for easy testing).
+    """
+    try:
+        ensemble = get_ensemble()
+        result = ensemble.predict(text, include_breakdown=False)
+        return result
+    except Exception as e:
+        logger.error(f"Quick analysis error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Placeholder endpoints - will be implemented in Phase 3
 @app.get("/api/trends")
 async def get_trends():
     """
     Get sentiment trends over time.
-    TODO: Implement trend aggregation.
+    TODO: Implement in Phase 3.
     """
     return {
         "trends": [],
@@ -77,7 +157,7 @@ async def get_trends():
 async def get_topics():
     """
     Get trending topics.
-    TODO: Implement BERTopic.
+    TODO: Implement in Phase 3.
     """
     return {
         "topics": [],
