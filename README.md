@@ -2,6 +2,16 @@
 
 A full-stack, distributed sentiment analysis platform that consumes the live **Bluesky Jetstream firehose** and processes it in real-time using distributed PySpark, storing results in a hot-storage SQLite database, and serving trends via a FastAPI backend to a modern React UI.
 
+## 🔄 Project Evolution
+
+**Before:** The project initially relied on static NLP datasets and a slower BERT-based batch inference system without real-time streaming capabilities.
+
+**Updates & Improvements:** This major update transformed the architecture into a **Scalable, Real-Time Big Data Pipeline**:
+- **Live Data Source:** Replaced static datasets with the Bluesky Jetstream firehose for continuous, real-time data ingestion.
+- **Enhanced Performance:** Transitioned away from slow batch processing to high-performance TextBlob and PySpark micro-batch analytics, eliminating data staleness.
+- **Distributed Architecture:** Integrated Dockerized Apache PySpark for robust and scalable multi-threaded event processing.
+- **Hot-Storage Database:** Implemented WAL-mode SQLite for efficient concurrency handling and rapid read/write of live streams.
+- **Premium Dashboard:** Completely revamped the React frontend with a professional, glassmorphic dark-theme UI that actively updates with live trends and metrics.
 ## ✨ Features
 
 - **🌐 Live Social Firehose** - Consumes real-time events from Bluesky's Jetstream API.
