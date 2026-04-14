@@ -1,109 +1,78 @@
-# Panchayat - Sentiment Analysis Dashboard
+# Panchayat - Real-Time Sentiment Analysis Dashboard
 
-A full-stack sentiment analysis platform that combines advanced ML models with a modern React dashboard for real-time insights from Reddit, Twitter, and custom datasets.
-
-![Dashboard Preview](docs/dashboard-dark.png)
+A full-stack, distributed sentiment analysis platform that consumes the live **Bluesky Jetstream firehose** and processes it in real-time using distributed PySpark, storing results in a hot-storage SQLite database, and serving trends via a FastAPI backend to a modern React UI.
 
 ## ✨ Features
 
-- **🤖 ML Ensemble** - Hybrid model using BERT, LSTM (TextBlob), and Random Forest
-- **📊 Real-time Dashboard** - Clean React UI with light/dark theme toggle
-- **📈 Trend Analysis** - Time-series sentiment tracking
-- **🔄 Multiple Data Sources** - Reddit API, CSV import, sample data
-- **💾 SQLite Storage** - Persistent post storage with sentiment scores
+- **🌐 Live Social Firehose** - Consumes real-time events from Bluesky's Jetstream API.
+- **⚡ Distributed Data Processing** - Utilizes **PySpark** structured streaming and micro-batch analytics to handle infinite data effectively.
+- **🤖 High-Performance NLP** - Uses TextBlob and custom logic to compute accurate sentiment over thousands of events per minute.
+- **📊 Real-time Dashboard** - Clean React UI with a dark glassmorphism theme, updating live every 10 seconds.
+- **🐳 Dockerized Infrastructure** - 100% containerized deployment with `docker-compose`.
+- **🛡️ Secure API** - Rate limited using `slowapi` to protect against spam.
+
+---
 
 ## 🚀 Quick Start Guide
 
-### 1. Clone the Repository
+### 1. Prerequisites
+Ensure you have Docker and Docker Compose installed on your system.
+You no longer need to worry about local Python/Node dependencies unless you intend to develop locally without Docker.
 
+### 2. Clone the Repository
 ```bash
 git clone https://github.com/RuchitAgrawal/panchayat.git
 cd panchayat
 ```
 
-### 2. Backend Setup (Python)
+### 3. Launch Services with Docker
+To bring up the FastAPI backend, PySpark Analytics Worker, and Bluesky Producer simultaneously:
 
 ```bash
-cd backend
-
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# Windows:
-./venv/Scripts/activate
-# Mac/Linux:
-# source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the server
-uvicorn main:app --reload --port 8000
+docker-compose up --build -d
 ```
-*Backend runs at: http://localhost:8000*
+*Note: This will download PyTorch and Spark, which may take some time during the first build.*
 
-### 3. Frontend Setup (React)
-
-Open a new terminal:
+### 4. Run the React Frontend
+Open a separate terminal and start the Vite development server:
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Run development server
 npm run dev
 ```
-*Frontend runs at: http://localhost:5173*
+*Frontend normally runs at: http://localhost:5173*
+*Dashboard immediately populates as soon as Spark processes the first micro-batch (allow 10-30 seconds).*
 
 ---
 
-## 📂 Using Kaggle Datasets
+## 🏗️ Architecture
 
-You can analyze large datasets like Sentiment140 (Twitter) or IMDB reviews.
+The backend consists of three standalone Docker services:
+1. **Producer (`panchayat_producer`)**: Connects to the Bluesky WSS Jetstream and pulls raw activity events, cleaning and appending them into localized `.jsonl` ingestion files.
+2. **Spark Worker (`panchayat_spark`)**: Runs a continuous micro-batch loop using Apache PySpark to load JSONL partitions, run sentiment inference across threads, and aggregate metrics into the hot storage.
+3. **API Server (`panchayat_api`)**: A standalone FastAPI instance rate-limited efficiently that serves REST endpoints. Connects to the synced SQLite hot-storage (`panchayat.db`) locally mounted via Docker volumes.
 
-1. **Download Dataset:**
-   - [Sentiment140 (Twitter)](https://www.kaggle.com/datasets/kazanova/sentiment140)
-   - [IMDB Movie Reviews](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews)
+## 🔌 Core API Endpoints
 
-2. **Setup:**
-   - Place the downloaded CSV file in `backend/datasets/`
-   - Rename it to `sentiment140.csv` (or `imdb.csv`)
-
-3. **Load Data via API:**
-   ```bash
-   # Example: Load 200 tweets
-   curl -X POST http://localhost:8000/api/kaggle/sentiment140 \
-     -H "Content-Type: application/json" \
-     -d '{"limit": 200, "balanced": true}'
-   ```
-
----
-
-## 🔌 API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/analyze` | POST | Analyze text sentiment |
-| `/api/trends` | GET | Get real-time trends |
-| `/api/posts` | GET | Fetch stored posts |
-| `/api/sample/quick` | GET | Load built-in sample data |
-| `/api/kaggle/status` | GET | Check available datasets |
+| Endpoint           | Method | Description                                      |
+|--------------------|--------|--------------------------------------------------|
+| `/api/posts/stats` | GET    | Fetch total aggregated post counts and metrics   |
+| `/api/trends`      | GET    | Fetch bucketed historical sentiment shifts       |
+| `/api/posts`       | GET    | Fetch the most recent analyzed posts             |
+| `/api/analyze`     | POST   | Manually analyze a custom string (Rate Limited)  |
 
 ## 🛠️ Tech Stack
 
-**Backend:**
-- FastAPI (Python)
-- PyTorch + Transformers (BERT)
-- scikit-learn (Random Forest)
-- SQLite + SQLAlchemy
+**Pipeline & Backend:**
+- Apache PySpark (Micro-Batch processing)
+- Python (Producer + Data cleaning)
+- FastAPI (REST endpoints)
+- TextBlob (Sentiment mapping)
 
 **Frontend:**
-- React 18
-- Vite
-- Recharts (Visualization)
-- CSS Variables (Theming)
+- React 18, Vite
+- Recharts (Time-series data visualization)
+- Vanilla CSS + Custom Layouts
 
 ## 📝 License
 

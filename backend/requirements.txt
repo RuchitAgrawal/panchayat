@@ -27,3 +27,11 @@ numpy>=1.26.0
 
 # HTTP Client (for frontend API)
 httpx>=0.26.0
+
+# Rate Limiting
+slowapi>=0.1.9
+
+# Big Data & Streaming
+pyspark>=3.5.0
+pyarrow>=14.0.1
+websockets>=12.0

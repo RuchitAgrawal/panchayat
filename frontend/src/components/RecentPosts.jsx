@@ -1,44 +1,47 @@
-// Recent posts table component
+// Premium live post feed
 export default function RecentPosts({ posts }) {
     const postList = posts?.posts || [];
 
-    if (postList.length === 0) {
-        return (
-            <div className="card">
-                <div className="card-title">Recent Posts</div>
-                <div className="loading">No posts yet. Load some data to get started!</div>
-            </div>
-        );
-    }
-
     return (
         <div className="card">
-            <div className="card-title">Recent Posts</div>
-            <table className="posts-table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Source</th>
-                        <th>Sentiment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {postList.slice(0, 10).map((post, index) => (
-                        <tr key={post.id || index}>
-                            <td className="post-title" title={post.title}>
-                                {post.title?.substring(0, 60) || 'No title'}
-                                {post.title?.length > 60 ? '...' : ''}
-                            </td>
-                            <td>{post.subreddit || 'Unknown'}</td>
-                            <td>
-                                <span className={`sentiment-badge ${post.sentiment?.label || 'neutral'}`}>
-                                    {post.sentiment?.label || 'N/A'}
-                                </span>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <div className="card-header">
+                <div className="card-title">Live Feed</div>
+                <div className="card-badge">{postList.length} posts</div>
+            </div>
+
+            {postList.length === 0 ? (
+                <div className="empty-state">
+                    <div className="empty-state-icon">📭</div>
+                    <div className="empty-state-text">
+                        No posts yet.<br />Start the backend to see live Bluesky posts here.
+                    </div>
+                </div>
+            ) : (
+                <div className="posts-feed">
+                    {postList.map((post, index) => {
+                        const label = post.sentiment?.label || 'neutral';
+                        return (
+                            <div
+                                key={post.id || index}
+                                className={`post-feed-card border-${label}`}
+                            >
+                                <div className="post-feed-header">
+                                    <span className="post-source">
+                                        {post.subreddit || 'bluesky'}
+                                    </span>
+                                    <span className={`sentiment-badge ${label}`}>
+                                        {label === 'positive' ? '😊 ' : label === 'negative' ? '😞 ' : '😐 '}
+                                        {label}
+                                    </span>
+                                </div>
+                                <div className="post-feed-content">
+                                    {post.title || 'No content'}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 }

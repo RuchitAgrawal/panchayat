@@ -143,9 +143,16 @@ class RFSentiment:
         return self.train(sample_texts, labels)
     
     def _get_default_samples(self) -> List[str]:
-        """Return default training samples."""
+        """
+        Default training samples biased toward social-media language (Fix #18).
+
+        The original 24 product-review sentences caused the RF to overfit on review
+        vocabulary and misclassify almost all real Bluesky posts.  This expanded set
+        covers politics, tech, sports, entertainment, news, and daily-life topics
+        in the informal register typical of short-form social media.
+        """
         return [
-            # Positive samples
+            # ── Positive ────────────────────────────────────────────────────
             "This is absolutely amazing and I love it!",
             "Great product, highly recommend to everyone",
             "Best experience ever, very happy with this",
@@ -154,8 +161,30 @@ class RFSentiment:
             "Wonderful, exceeded all my expectations",
             "Perfect solution to my problem",
             "Outstanding performance and value",
-            
-            # Negative samples
+            "just watched the new season and it was incredible omg",
+            "honestly the best decision i ever made, feeling so grateful",
+            "this update is fire!! the new features are exactly what i needed",
+            "everyone needs to try this, it changed my life fr",
+            "so proud of how far this team has come, amazing journey",
+            "the concert last night was absolutely unreal, best night of my life",
+            "finally got the job offer!! hard work pays off 🎉",
+            "can't believe how talented this person is, true inspiration",
+            "loving the new update, they really listened to user feedback",
+            "the community here is so wholesome and supportive, love you all",
+            "just finished the book and my mind is blown, 10/10 recommend",
+            "the customer support went above and beyond, truly impressed",
+            "new model just dropped and the benchmarks are insane",
+            "this policy change is a huge W for everyone involved",
+            "beautiful weather today, life is good",
+            "huge shoutout to the dev team, you knocked it out of the park",
+            "the open source community saves the day again, legend status",
+            "this research paper is groundbreaking, big implications for the field",
+            "proud of my city for coming together after the disaster",
+            "the athlete's comeback story is genuinely moving",
+            "local restaurant started composting, small wins matter",
+            "new renewable energy record broken again, the future is bright",
+
+            # ── Negative ────────────────────────────────────────────────────
             "This is terrible and I hate it",
             "Worst experience of my life, very disappointed",
             "Awful quality, complete waste of money",
@@ -164,8 +193,30 @@ class RFSentiment:
             "Complete garbage, don't buy this",
             "Extremely disappointing and useless",
             "Terrible product, broke immediately",
-            
-            # Neutral samples
+            "they literally lied to our faces and no one is being held accountable",
+            "this update broke everything i hate when companies do this",
+            "the app is completely unusable now, what happened to QA",
+            "so tired of empty promises from these politicians",
+            "this is such a scam, they should be ashamed",
+            "the whole situation is just depressing, no hope in sight",
+            "another data breach? my trust is completely gone at this point",
+            "the queue has been broken for three days, zero support response",
+            "spent two hours on hold just to get disconnected, furious",
+            "they deleted everyone's progress with no warning or backup",
+            "the misinformation spreading about this topic is genuinely dangerous",
+            "cost of living is crushing people and no one seems to care",
+            "laid off right before the holidays, absolutely devastating",
+            "the traffic is unbearable today, already an hour late",
+            "why is it always the good shows that get cancelled smh",
+            "another oil spill and still no accountability, disgusting",
+            "the match was fixed i swear, beyond frustrated with this league",
+            "censorship is getting out of hand and it's scary",
+            "watched the debate and genuinely lost faith in the whole system",
+            "this team has let down the fans year after year",
+            "the hospital wait times are a crisis, people are suffering",
+            "prices went up again and quality went down, classic",
+
+            # ── Neutral ─────────────────────────────────────────────────────
             "It's okay, nothing special",
             "Average product, does the job",
             "Not great but not bad either",
@@ -174,6 +225,23 @@ class RFSentiment:
             "Typical performance, no complaints",
             "Regular product with normal features",
             "It's fine, just what I expected",
+            "just got the update, will test it this weekend and report back",
+            "interesting announcement, need to see how it plays out in practice",
+            "the meeting went okay, some good points raised on both sides",
+            "back at the office today, same as usual really",
+            "article worth reading if you're into this topic",
+            "weather is about average for this time of year",
+            "quarterly results were in line with analyst expectations",
+            "new policy takes effect next month, details in the link",
+            "the patch notes are out, several bug fixes and minor changes",
+            "attended the conference, got some useful contacts",
+            "the game ended 1-1, pretty even contest overall",
+            "the bill passed with amendments, debate continues in the senate",
+            "researchers published findings on the topic, mixed conclusions",
+            "the update rolled out overnight, checking compatibility now",
+            "election results are still being counted in several districts",
+            "the new museum wing opens to the public on Saturday",
+            "the company reported revenue was flat compared to last quarter",
         ]
     
     def predict(self, text: str) -> Dict:

@@ -5,10 +5,9 @@ const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
     const [theme, setTheme] = useState(() => {
-        // Check localStorage or system preference
+        // Default to dark — the dashboard is designed dark-first
         const saved = localStorage.getItem('panchayat-theme');
-        if (saved) return saved;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        return saved || 'dark';
     });
 
     useEffect(() => {

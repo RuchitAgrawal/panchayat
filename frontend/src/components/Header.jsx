@@ -1,5 +1,5 @@
-// Header component with logo and theme toggle
 import { useTheme } from '../hooks/useTheme';
+import { NavLink } from 'react-router-dom';
 
 export default function Header() {
     const { theme, toggleTheme } = useTheme();
@@ -8,18 +8,42 @@ export default function Header() {
         <header className="header">
             <div className="header-logo">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
                 </svg>
                 Panchayat
+                <div className="header-logo-dot" title="Live Data Active"></div>
             </div>
 
-            <button
-                className="theme-toggle"
-                onClick={toggleTheme}
-                aria-label="Toggle theme"
-            >
-                {theme === 'light' ? '🌙' : '☀️'}
-            </button>
+            <nav className="header-nav">
+                <NavLink
+                    to="/"
+                    end
+                    className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+                >
+                    Overview
+                </NavLink>
+                <NavLink
+                    to="/trends"
+                    className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+                >
+                    Trends &amp; Topics
+                </NavLink>
+            </nav>
+
+            <div className="header-right">
+                <div className="live-pill">
+                    <span className="live-dot"></span>
+                    Live
+                </div>
+                <button
+                    className="theme-toggle"
+                    onClick={toggleTheme}
+                    aria-label="Toggle theme"
+                    title="Toggle light/dark mode"
+                >
+                    {theme === 'light' ? '🌙' : '☀️'}
+                </button>
+            </div>
         </header>
     );
 }

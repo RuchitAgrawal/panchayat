@@ -1,79 +1,71 @@
-// Sentiment gauge component - animated dial
-export default function SentimentGauge({ score, label }) {
-    // Score ranges from -1 to 1, convert to 0-100 for display
-    const displayValue = Math.round(((score || 0) + 1) * 50);
+// Sentiment Breakdown component — replaces the old gauge with a clear visual breakdown
+export default function SentimentGauge({ score, label, stats }) {
+    const distribution = stats?.stats?.distribution || {};
+    const total = stats?.stats?.total || 0;
 
-    // Calculate rotation for gauge needle (-90 to +90 degrees)
-    const rotation = (displayValue / 100) * 180 - 90;
+    const positive = distribution.positive || 0;
+    const negative = distribution.negative || 0;
+    const neutral  = distribution.neutral  || 0;
 
-    // Determine color based on score
-    const getColor = () => {
-        if (score >= 0.3) return 'var(--positive)';
-        if (score <= -0.3) return 'var(--negative)';
-        return 'var(--neutral)';
-    };
+    const positivePercent = total > 0 ? Math.round((positive / total) * 100) : 0;
+    const negativePercent = total > 0 ? Math.round((negative / total) * 100) : 0;
+    const neutralPercent  = total > 0 ? Math.round((neutral  / total) * 100) : 0;
+
+    // Overall dominant mood
+    let dominantLabel = 'Neutral';
+    let dominantColor = 'var(--neutral)';
+    if (positivePercent > negativePercent && positivePercent > neutralPercent) {
+        dominantLabel = 'Mostly Positive';
+        dominantColor = 'var(--positive)';
+    } else if (negativePercent > positivePercent && negativePercent > neutralPercent) {
+        dominantLabel = 'Mostly Negative';
+        dominantColor = 'var(--negative)';
+    }
+
+    const rows = [
+        { key: 'positive', label: 'Positive', pct: positivePercent, color: 'var(--positive)', dot: '#22c55e' },
+        { key: 'neutral',  label: 'Neutral',  pct: neutralPercent,  color: 'var(--neutral)',  dot: '#94a3b8' },
+        { key: 'negative', label: 'Negative', pct: negativePercent, color: 'var(--negative)', dot: '#ef4444' },
+    ];
 
     return (
-        <div className="card gauge-container">
-            <div className="card-title">Overall Sentiment</div>
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="card-title" style={{ marginBottom: '20px' }}>Sentiment Breakdown</div>
 
-            <svg viewBox="0 0 200 120" width="200" height="120">
-                {/* Background arc */}
-                <path
-                    d="M 20 100 A 80 80 0 0 1 180 100"
-                    fill="none"
-                    stroke="var(--border-color)"
-                    strokeWidth="12"
-                    strokeLinecap="round"
-                />
+            <div className="sentiment-breakdown">
+                <div>
+                    <div className="breakdown-header">
+                        <span className="breakdown-score" style={{ color: dominantColor }}>
+                            {positivePercent}%
+                        </span>
+                        <span className="breakdown-label">{dominantLabel}</span>
+                    </div>
 
-                {/* Colored segments */}
-                <path
-                    d="M 20 100 A 80 80 0 0 1 60 35"
-                    fill="none"
-                    stroke="var(--negative)"
-                    strokeWidth="12"
-                    strokeLinecap="round"
-                    opacity="0.6"
-                />
-                <path
-                    d="M 60 35 A 80 80 0 0 1 140 35"
-                    fill="none"
-                    stroke="var(--gauge-neutral)"
-                    strokeWidth="12"
-                    opacity="0.6"
-                />
-                <path
-                    d="M 140 35 A 80 80 0 0 1 180 100"
-                    fill="none"
-                    stroke="var(--positive)"
-                    strokeWidth="12"
-                    strokeLinecap="round"
-                    opacity="0.6"
-                />
+                    {/* Stacked bar */}
+                    <div className="breakdown-stacked-bar">
+                        <span style={{ width: `${positivePercent}%`, background: 'var(--positive)' }} />
+                        <span style={{ width: `${neutralPercent}%`,  background: 'var(--neutral)'  }} />
+                        <span style={{ width: `${negativePercent}%`, background: 'var(--negative)' }} />
+                    </div>
+                </div>
 
-                {/* Needle */}
-                <line
-                    x1="100"
-                    y1="100"
-                    x2="100"
-                    y2="30"
-                    stroke={getColor()}
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    transform={`rotate(${rotation}, 100, 100)`}
-                    style={{ transition: 'transform 0.5s ease-out' }}
-                />
-
-                {/* Center dot */}
-                <circle cx="100" cy="100" r="8" fill={getColor()} />
-            </svg>
-
-            <div className="gauge-value" style={{ color: getColor() }}>
-                {displayValue}%
-            </div>
-            <div className="gauge-label">
-                {label || (score >= 0.3 ? 'Positive' : score <= -0.3 ? 'Negative' : 'Neutral')}
+                <div className="breakdown-rows">
+                    {rows.map(row => (
+                        <div className="breakdown-row" key={row.key}>
+                            <div className="breakdown-row-label">
+                                <span className="breakdown-row-dot" style={{ background: row.dot }} />
+                                {row.label}
+                            </div>
+                            <div className="breakdown-row-track">
+                                <div
+                                    className="breakdown-row-fill"
+                                    style={{ width: `${row.pct}%`, background: row.color }}
+                                />
+                            </div>
+                            <div className="breakdown-row-pct">{row.pct}%</div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

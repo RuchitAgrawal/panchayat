@@ -19,6 +19,12 @@ export async function fetchPosts(limit = 20) {
     return res.json();
 }
 
+export async function fetchTopics(limit = 20) {
+    const res = await fetch(`${API_BASE}/api/topics?limit=${limit}`);
+    if (!res.ok) throw new Error('Failed to fetch topics');
+    return res.json();
+}
+
 export async function analyzeSentiment(text) {
     const res = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',

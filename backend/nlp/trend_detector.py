@@ -3,6 +3,17 @@ Trend Detection and Time-Series Aggregation.
 
 Tracks sentiment over time and aggregates data for trend visualization.
 Provides rolling averages and time-bucketed sentiment scores.
+
+NOTE (Fix #12 — dead code):
+    The `trend_detector` singleton below is NOT currently wired into the FastAPI
+    routes.  `main.py` queries the `hourly_trends` SQLite table directly instead.
+    This class is retained because it is a useful, self-contained utility that
+    could be activated for:
+      - An SSE (Server-Sent Events) push endpoint for real-time chart updates
+      - An in-process analytics layer if SQLite is replaced by something faster
+
+    To wire it in, import `add_sentiment_entry` from this module inside
+    `spark_job_runner.update_hot_storage()` and call it for each processed post.
 """
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta

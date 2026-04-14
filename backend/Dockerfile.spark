@@ -1,0 +1,28 @@
+FROM python:3.10-slim
+
+# Install Java OS Dependencies for PySpark
+RUN mkdir -p /usr/share/man/man1 && \
+    apt-get update && \
+    apt-get install -y default-jre procps && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/default-java
+
+WORKDIR /app
+
+# Copy requirements entirely
+COPY requirements.txt .
+
+# Install Python ML and Big Data requirements
+RUN pip install --default-timeout=1000 --no-cache-dir -r requirements.txt
+
+# Create necessary directories
+RUN mkdir -p data/raw data/processed db
+
+COPY . .
+
+# Ensure timezone is UTC
+ENV TZ=UTC
+
+CMD ["python", "main.py"]

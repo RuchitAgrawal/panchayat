@@ -23,10 +23,14 @@ def _get_pipeline():
         try:
             from transformers import pipeline
             logger.info(f"Loading BERT model: {_model_name}")
+            # Fix #15 — let the tokenizer handle truncation correctly
+            # (character-count slicing is inaccurate for multilingual models)
             _pipeline = pipeline(
                 "sentiment-analysis",
                 model=_model_name,
-                tokenizer=_model_name
+                tokenizer=_model_name,
+                truncation=True,
+                max_length=512,
             )
             logger.info("BERT model loaded successfully")
         except Exception as e:
@@ -115,9 +119,8 @@ class BertSentiment:
             }
         
         try:
-            # Truncate text to max length (rough estimate: 4 chars per token)
-            truncated = text[:self.max_length * 4]
-            result = self.classifier(truncated)[0]
+            # Fix #15 — tokenizer handles truncation; no manual char-slicing needed
+            result = self.classifier(text)[0]
             return self._star_to_sentiment(result["label"], result["score"])
         except Exception as e:
             logger.error(f"BERT prediction error: {e}")

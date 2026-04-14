@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  producer:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.spark
+    container_name: panchayat_producer
+    command: ["python", "stream/bluesky_producer.py"]
+    volumes:
+      - ./backend:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
+
+  spark-worker:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.spark
+    container_name: panchayat_spark
+    command: ["python", "analytics/spark_job_runner.py"]
+    volumes:
+      - ./backend:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
+
+  api-server:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.spark
+    container_name: panchayat_api
+    command: ["sh", "-c", "pip install slowapi && uvicorn main:app --host 0.0.0.0 --port 8000"]
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
