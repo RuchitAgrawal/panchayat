@@ -11,12 +11,8 @@ torch>=2.0.0
 scikit-learn>=1.4.0
 textblob>=0.17.0
 
-# NLP - Topic Modeling
-bertopic>=0.16.0
-sentence-transformers>=2.3.0
-
 # Reddit API
-praw>=7.7.0
+# Removed: praw (Replaced by Bluesky Jetstream)
 
 # Database
 sqlalchemy>=2.0.0
